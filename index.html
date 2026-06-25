@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>業務AI化マップ（無料診断）｜MIWS</title>
+<meta name="description" content="2つ選ぶだけ。あなたが最初にAIに任せられる業務トップ3と、最初の設計メモが出ます。">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+<style>
+  :root{ --bg:#f4f3ee; --card:#ffffff; --muted:#6b6a64; --text:#1c1c1a; --border:rgba(0,0,0,0.14); --soft:#f4f3ee;
+    --info-bg:#E6F1FB; --info:#0C447C; --success:#27500A; --danger:#A32D2D; }
+  @media (prefers-color-scheme: dark){ :root{ --bg:#1a1a18; --card:#242420; --muted:#a3a29a; --text:#f1efe8;
+    --border:rgba(255,255,255,0.16); --soft:#2c2c28; --info-bg:#0C447C; --info:#B5D4F4; --success:#C0DD97; --danger:#F7C1C1; } }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Noto Sans JP","Segoe UI",sans-serif;
+    line-height:1.7;padding:2rem 1rem;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:620px;margin:0 auto}
+  .lead{text-align:center;margin:0 0 1.5rem}
+  .lead h1{font-size:21px;font-weight:500;margin:0 0 4px}
+  .lead p{font-size:13px;color:var(--muted);margin:0}
+  .card{background:var(--card);border:0.5px solid var(--border);border-radius:14px;padding:1.2rem 1.3rem}
+  .q{font-size:14px;font-weight:500;margin-top:4px}
+  .qrow{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 1.25rem}
+  .chip{font-size:13px;padding:7px 13px;border-radius:8px;border:0.5px solid var(--border);background:transparent;color:var(--text);cursor:pointer;font-family:inherit}
+  .chip.sel{background:var(--info-bg);color:var(--info);border-color:var(--info)}
+  button.run{font-size:14px;font-family:inherit;background:var(--info-bg);color:var(--info);border:0.5px solid var(--info);border-radius:8px;padding:9px 16px;cursor:pointer}
+  .rcard{border:0.5px solid var(--border);border-radius:12px;padding:.85rem 1rem;margin-bottom:10px}
+  .rttl{font-size:14px;font-weight:500;display:flex;align-items:center;gap:8px}
+  .num{background:var(--info-bg);color:var(--info);border-radius:50%;width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;font-size:12px}
+  .rline{font-size:13px;color:var(--muted);margin-top:4px}
+  .note{background:var(--soft);border-radius:8px;padding:10px 12px;font-size:13px;margin-top:6px}
+  .cta{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+  .cta a{font-size:13px;text-decoration:none;color:var(--text);border:0.5px solid var(--border);border-radius:8px;padding:8px 14px}
+  .cta a.p{background:var(--info-bg);color:var(--info);border-color:var(--info)}
+  .credit{text-align:center;font-size:12px;color:var(--muted);margin-top:1.5rem}
+  .credit a{color:var(--info);text-decoration:none}
+  i{vertical-align:-2px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="lead">
+    <h1>業務AI化マップ（無料診断）</h1>
+    <p>2つ選ぶだけ。あなたが"最初にAIに任せられる業務"と設計メモが出ます。</p>
+  </div>
+  <div class="card">
+    <div class="q">Q1. あなたの事業は？</div>
+    <div class="qrow" id="q1">
+      <button class="chip" data-v="個人事業・フリーランス">個人事業・フリーランス</button>
+      <button class="chip" data-v="店舗・サービス業">店舗・サービス業</button>
+      <button class="chip" data-v="建設・現場">建設・現場</button>
+      <button class="chip" data-v="小さなチーム">小さなチーム(〜10名)</button>
+    </div>
+    <div class="q">Q2. 一番"時間を奪う"業務は？（複数可）</div>
+    <div class="qrow" id="q2">
+      <button class="chip" data-v="invoice">請求書・見積</button>
+      <button class="chip" data-v="mail">問い合わせ・メール対応</button>
+      <button class="chip" data-v="report">日報・報告書</button>
+      <button class="chip" data-v="sns">SNS・発信</button>
+      <button class="chip" data-v="sched">予約・スケジュール調整</button>
+      <button class="chip" data-v="data">データ入力・集計</button>
+      <button class="chip" data-v="doc">資料・ドキュメント作成</button>
+    </div>
+    <button class="run" id="run"><i class="ti ti-sparkles"></i> 診断する</button>
+    <div id="result" style="margin-top:1.25rem"></div>
+  </div>
+  <p class="credit">MIWS Company OS — 「AIが会社を運営したらどうなるか」公開実験 ・ <a href="https://x.com/nariken">@nariken</a></p>
+</div>
+<script>
+  const TASKS={
+    invoice:{n:"請求書・見積",ai:"過去データから請求書・見積をドラフト",ok:"金額と送付先を確認",eff:"月末の事務が数十分→数分に"},
+    mail:{n:"問い合わせ・メール対応",ai:"内容を分類し返信文をドラフト",ok:"送信前にひと目チェック",eff:"一次対応が即時化、放置ゼロ"},
+    report:{n:"日報・報告書",ai:"日々の記録から自動生成＋異常も抽出",ok:"内容を承認",eff:"報告書づくりがほぼゼロに"},
+    sns:{n:"SNS・発信",ai:"出来事・実績から投稿をドラフト",ok:"トーンを確認して投稿",eff:"発信の継続が一気に楽に"},
+    sched:{n:"予約・スケジュール調整",ai:"空き枠提案と調整文をドラフト",ok:"確定を承認",eff:"往復のやりとりを大幅削減"},
+    data:{n:"データ入力・集計",ai:"入力・集計・レポート化を自動",ok:"数字を確認",eff:"転記ミスと作業時間を削減"},
+    doc:{n:"資料・ドキュメント作成",ai:"構成と下書きを生成",ok:"仕上げを承認",eff:"ゼロから書く時間を削減"}
+  };
+  let q2=[];
+  document.querySelectorAll('#q1 .chip').forEach(b=>b.onclick=()=>{
+    document.querySelectorAll('#q1 .chip').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');});
+  document.querySelectorAll('#q2 .chip').forEach(b=>b.onclick=()=>{
+    b.classList.toggle('sel');q2=[...document.querySelectorAll('#q2 .chip.sel')].map(x=>x.dataset.v);});
+  document.getElementById('run').onclick=()=>{
+    const r=document.getElementById('result');
+    if(!q2.length){r.innerHTML='<p style="font-size:13px;color:var(--danger)">Q2を1つ以上選んでください。</p>';return;}
+    const pick=q2.slice(0,3);
+    let h='<div style="font-size:13px;color:var(--muted);margin-bottom:8px"><i class="ti ti-checklist"></i> あなたが最初にAIへ任せられる業務 '+pick.length+'件（設計メモ）</div>';
+    pick.forEach((k,i)=>{const t=TASKS[k];h+='<div class="rcard"><div class="rttl"><span class="num">'+(i+1)+'</span>'+t.n+'</div><div class="rline"><i class="ti ti-robot"></i> AIが起案: '+t.ai+'</div><div class="rline"><i class="ti ti-shield-check" style="color:var(--success)"></i> あなたが承認: '+t.ok+'</div><div class="rline"><i class="ti ti-trending-up"></i> 効果: '+t.eff+'</div></div>';});
+    h+='<div class="note"><b style="font-weight:500">AIは"起案"まで・最終承認はあなた</b>。だから安心して任せられます。これがあなたの「最初の設計メモ」です。</div>';
+    h+='<div class="cta"><a class="p" href="https://x.com/nariken">実験をフォローする</a><a href="https://x.com/messages/compose?recipient_id=17831224">この設計を相談する</a></div>';
+    r.innerHTML=h;
+  };
+</script>
+</body>
+</html>
