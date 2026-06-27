@@ -79,6 +79,11 @@
     sns:{t:"SNS・発信",use:"投稿の下書きを作る",p:"次の出来事を、Xの投稿に。共感を呼ぶ問いで終える。140字以内で3案。\n【出来事】（ここに書く）"}
   };
   const POP=["mail","doc","research"];
+  const FUN=[
+    {n:"🎲 アイデアガチャ",p:"「ガチャ回して」でお題が出るゲーム。SaaS/YouTube/AI/ゲーム/ハードからランダムに1つ選んで、その場でアイデアを5案、各1行で。"},
+    {n:"⚔️ あえて反対派にする",p:"私の考えを、投資家・顧客・競合の3視点で容赦なく批判して。最後に一番危ない穴を1つ。\n【私の考え】（ここに書く）"},
+    {n:"🐉 100億円企業ゲーム",p:"「100億円企業を作るゲーム」をして。私がCEO、あなたが進行役。毎ターン状況と3つの選択肢を出して、私の選択で物語を進めて。"}
+  ];
   let q1=null,q2=[];
   document.querySelectorAll('#q1 .chip').forEach(b=>b.onclick=()=>{document.querySelectorAll('#q1 .chip').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');q1=+b.dataset.v;});
   document.querySelectorAll('#q2 .chip').forEach(b=>b.onclick=()=>{b.classList.toggle('sel');q2=[...document.querySelectorAll('#q2 .chip.sel')].map(x=>x.dataset.v);});
@@ -91,11 +96,13 @@
     keys.forEach((k,i)=>c+='<div class="u"><b>'+(i+1)+'.</b> '+T[k].t+'：'+T[k].use+'</div>');
     c+='</div><div class="foot"><span>ChatGPT活用法 診断</span><span>'+URL_+' · @nariken</span></div></div>';
     c+='<div style="margin-top:1rem;font-size:13px;color:var(--muted);">▼ そのままコピペで使えるプロンプト</div>';
-    keys.forEach((k,i)=>{c+='<div class="pbox"><div style="font-size:13px;font-weight:500;">'+(i+1)+'. '+T[k].use+'</div><pre id="p'+i+'">'+T[k].p.replace(/</g,"&lt;")+'</pre><button class="copy" data-i="'+i+'">コピー</button></div>';});
-    const share='私に効くChatGPT活用法、診断したら『'+T[keys[0]].t+'』だった👇\nコピペで使えるプロンプトまで出た。あなたは？\n→ https://'+URL_+'\n#ChatGPT #AI活用';
+    keys.forEach((k,i)=>{c+='<div class="pbox"><div style="font-size:13px;font-weight:500;">'+(i+1)+'. '+T[k].use+'</div><pre id="p'+i+'">'+T[k].p.replace(/</g,"&lt;")+'</pre><button class="copy" data-t="p'+i+'">コピー</button></div>';});
+    c+='<div style="margin-top:1.1rem;font-size:13px;color:var(--muted);">🎁 おまけ：仕事を忘れて“遊べる”使い方（これが一番ハマる）</div>';
+    FUN.forEach((f,i)=>{c+='<div class="pbox"><div style="font-size:13px;font-weight:500;">'+f.n+'</div><pre id="f'+i+'">'+f.p.replace(/</g,"&lt;")+'</pre><button class="copy" data-t="f'+i+'">コピー</button></div>';});
+    const share='ChatGPTの使い方診断やってみた→『'+T[keys[0]].t+'』だった👇\nコピペで使えるプロンプト＋“遊べる使い方”まで出た。あなたは？\n→ https://'+URL_+'\n#ChatGPT #AI活用';
     c+='<div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;"><button class="run" id="share" style="padding:8px 16px;">結果をシェア</button><button class="act" id="save">画像を保存</button><button class="act" onclick="location.href=\'https://x.com/nariken\'">もっと活用法を見る</button></div>';
     r.innerHTML=c;
-    document.querySelectorAll('.copy').forEach(b=>b.onclick=()=>{const tx=document.getElementById('p'+b.dataset.i).innerText;navigator.clipboard.writeText(tx).then(()=>{b.textContent='コピーした！';setTimeout(()=>b.textContent='コピー',1400);});});
+    document.querySelectorAll('.copy').forEach(b=>b.onclick=()=>{const tx=document.getElementById(b.dataset.t).innerText;navigator.clipboard.writeText(tx).then(()=>{b.textContent='コピーした！';setTimeout(()=>b.textContent='コピー',1400);});});
     const cardEl=document.getElementById('card');
     const toBlob=()=>html2canvas(cardEl,{scale:2,backgroundColor:'#ffffff'}).then(cv=>new Promise(res=>cv.toBlob(res,'image/png')));
     document.getElementById('save').onclick=()=>toBlob().then(b=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='chatgpt-katsuyo.png';a.click();});
