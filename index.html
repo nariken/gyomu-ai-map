@@ -100,13 +100,21 @@
     c+='<div style="margin-top:1.1rem;font-size:13px;color:var(--muted);">🎁 おまけ：仕事を忘れて“遊べる”使い方（これが一番ハマる）</div>';
     FUN.forEach((f,i)=>{c+='<div class="pbox"><div style="font-size:13px;font-weight:500;">'+f.n+'</div><pre id="f'+i+'">'+f.p.replace(/</g,"&lt;")+'</pre><button class="copy" data-t="f'+i+'">コピー</button></div>';});
     const share='ChatGPTの使い方診断やってみた→『'+T[keys[0]].t+'』だった👇\nコピペで使えるプロンプト＋“遊べる使い方”まで出た。あなたは？\n→ https://'+URL_+'\n#ChatGPT #AI活用';
-    c+='<div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;"><button class="run" id="share" style="padding:8px 16px;">結果をシェア</button><button class="act" id="save">画像を保存</button><button class="act" onclick="location.href=\'https://x.com/nariken\'">もっと活用法を見る</button></div>';
+    const isMobile=/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)||(navigator.maxTouchPoints>1&&/Mac/.test(navigator.platform));
+    c+='<div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;">';
+    if(isMobile){c+='<button class="run" id="share" style="padding:8px 16px;">結果をシェア</button>';}
+    else{c+='<button class="run" id="copyimg" style="padding:8px 16px;">画像をコピー</button><a class="act" href="https://x.com/intent/post?text='+encodeURIComponent(share)+'" target="_blank" style="text-decoration:none;color:var(--text);">Xを開く</a>';}
+    c+='<button class="act" id="save">画像を保存</button><button class="act" onclick="location.href=\'https://x.com/nariken\'">もっと活用法を見る</button></div>';
+    c+='<p style="font-size:12px;color:var(--muted);margin-top:8px;">'+(isMobile?'「結果をシェア」でXを選ぶと画像つきで投稿できます。':'PCは「画像をコピー」→「Xを開く」→投稿欄で Cmd+V（Ctrl+V）で貼り付け。')+'</p>';
     r.innerHTML=c;
     document.querySelectorAll('.copy').forEach(b=>b.onclick=()=>{const tx=document.getElementById(b.dataset.t).innerText;navigator.clipboard.writeText(tx).then(()=>{b.textContent='コピーした！';setTimeout(()=>b.textContent='コピー',1400);});});
     const cardEl=document.getElementById('card');
     const toBlob=()=>html2canvas(cardEl,{scale:2,backgroundColor:'#ffffff'}).then(cv=>new Promise(res=>cv.toBlob(res,'image/png')));
     document.getElementById('save').onclick=()=>toBlob().then(b=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='chatgpt-katsuyo.png';a.click();});
-    document.getElementById('share').onclick=async()=>{const blob=await toBlob();const file=new File([blob],'chatgpt-katsuyo.png',{type:'image/png'});if(navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file],text:share});return;}catch(e){if(e&&e.name==='AbortError')return;}}const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='chatgpt-katsuyo.png';a.click();window.open('https://x.com/intent/post?text='+encodeURIComponent(share),'_blank');};
+    const sb=document.getElementById('share');
+    if(sb)sb.onclick=async()=>{const blob=await toBlob();const file=new File([blob],'chatgpt-katsuyo.png',{type:'image/png'});if(navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file],text:share});return;}catch(e){if(e&&e.name==='AbortError')return;}}const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='chatgpt-katsuyo.png';a.click();};
+    const cb=document.getElementById('copyimg');
+    if(cb)cb.onclick=async()=>{const blob=await toBlob();let ok=false;try{if(navigator.clipboard&&window.ClipboardItem){await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);ok=true;}}catch(e){}if(ok){cb.textContent='コピーした！Xに貼り付け';setTimeout(()=>cb.textContent='画像をコピー',2200);}else{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='chatgpt-katsuyo.png';a.click();}};
     r.scrollIntoView({behavior:'smooth',block:'nearest'});
   };
 </script>
