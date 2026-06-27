@@ -113,18 +113,26 @@
     c+='</div>';
     const share='私のAI活用タイプは【'+t.name+'】成熟度'+score+'でした。あなたは？\n→ AI活用タイプ診断 https://'+URL_+'\n#AI会社運営 #PublicBuild';
     c+='<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">';
+    c+='<button class="run" id="share" style="padding:8px 16px;">結果をシェア</button>';
     c+='<button class="act" id="save">画像を保存</button>';
-    c+='<button class="act" onclick="openX(\''+encodeURIComponent(share)+'\')">Xでシェア</button>';
     c+='<button class="act" onclick="location.href=\'https://x.com/nariken\'">実験をフォロー</button>';
     c+='</div>';
-    c+='<p style="font-size:12px;color:var(--muted);margin-top:8px;">AIは起案まで・承認はあなた。画像を保存して投稿すると、結果カードがそのまま載ります。</p>';
+    c+='<p style="font-size:12px;color:var(--muted);margin-top:8px;">スマホは「結果をシェア」で画像つき投稿（共有先にXを選択）。非対応の端末は画像保存＋テキストに自動で切替。</p>';
     r.innerHTML=c;
-    document.getElementById('save').onclick=()=>{
-      html2canvas(document.getElementById('card'),{scale:2,backgroundColor:'#ffffff'}).then(cv=>{const a=document.createElement('a');a.href=cv.toDataURL('image/png');a.download='ai-type-'+t.name+'.png';a.click();});
+    const cardEl=document.getElementById('card');
+    const toBlob=()=>html2canvas(cardEl,{scale:2,backgroundColor:'#ffffff'}).then(cv=>new Promise(res=>cv.toBlob(res,'image/png')));
+    document.getElementById('save').onclick=()=>toBlob().then(b=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='ai-type-'+t.name+'.png';a.click();});
+    document.getElementById('share').onclick=async()=>{
+      const blob=await toBlob();
+      const file=new File([blob],'ai-type.png',{type:'image/png'});
+      if(navigator.canShare&&navigator.canShare({files:[file]})){
+        try{await navigator.share({files:[file],text:share});return;}catch(e){if(e&&e.name==='AbortError')return;}
+      }
+      const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='ai-type.png';a.click();
+      window.open('https://x.com/intent/post?text='+encodeURIComponent(share),'_blank');
     };
     r.scrollIntoView({behavior:'smooth',block:'nearest'});
   };
-  function openX(txt){window.open('https://x.com/intent/post?text='+txt,'_blank');}
 </script>
 <script data-goatcounter="https://nariken.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body>
