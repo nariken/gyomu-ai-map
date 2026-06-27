@@ -3,95 +3,128 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>業務AI化マップ（無料診断）｜MIWS</title>
-<meta name="description" content="2つ選ぶだけ。あなたが最初にAIに任せられる業務トップ3と、最初の設計メモが出ます。">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+<title>AI活用タイプ診断｜MIWS</title>
+<meta name="description" content="3問でわかる。あなたのAI活用タイプ・成熟度スコア・次の一手3つが、シェアできる1枚で出ます。">
 <style>
-  :root{ --bg:#f4f3ee; --card:#ffffff; --muted:#6b6a64; --text:#1c1c1a; --border:rgba(0,0,0,0.14); --soft:#f4f3ee;
-    --info-bg:#E6F1FB; --info:#0C447C; --success:#27500A; --danger:#A32D2D; }
-  @media (prefers-color-scheme: dark){ :root{ --bg:#1a1a18; --card:#242420; --muted:#a3a29a; --text:#f1efe8;
-    --border:rgba(255,255,255,0.16); --soft:#2c2c28; --info-bg:#0C447C; --info:#B5D4F4; --success:#C0DD97; --danger:#F7C1C1; } }
+  :root{ --bg:#f4f3ee; --card:#ffffff; --muted:#6b6a64; --text:#1c1c1a; --border:rgba(0,0,0,0.14); --soft:#f4f3ee; --info-bg:#E6F1FB; --info:#0C447C; }
+  @media (prefers-color-scheme: dark){ :root{ --bg:#1a1a18; --card:#242420; --muted:#a3a29a; --text:#f1efe8; --border:rgba(255,255,255,0.16); --soft:#2c2c28; --info-bg:#0C447C; --info:#B5D4F4; } }
   *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--text);
-    font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Noto Sans JP","Segoe UI",sans-serif;
-    line-height:1.7;padding:2rem 1rem;-webkit-font-smoothing:antialiased}
-  .wrap{max-width:620px;margin:0 auto}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Noto Sans JP","Segoe UI",sans-serif;line-height:1.7;padding:2rem 1rem;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:560px;margin:0 auto}
   .lead{text-align:center;margin:0 0 1.5rem}
   .lead h1{font-size:21px;font-weight:500;margin:0 0 4px}
   .lead p{font-size:13px;color:var(--muted);margin:0}
-  .card{background:var(--card);border:0.5px solid var(--border);border-radius:14px;padding:1.2rem 1.3rem}
+  .panel{background:var(--card);border:0.5px solid var(--border);border-radius:14px;padding:1.2rem 1.3rem}
   .q{font-size:14px;font-weight:500;margin-top:4px}
-  .qrow{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 1.25rem}
+  .qrow{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 1.2rem}
   .chip{font-size:13px;padding:7px 13px;border-radius:8px;border:0.5px solid var(--border);background:transparent;color:var(--text);cursor:pointer;font-family:inherit}
   .chip.sel{background:var(--info-bg);color:var(--info);border-color:var(--info)}
-  button.run{font-size:14px;font-family:inherit;background:var(--info-bg);color:var(--info);border:0.5px solid var(--info);border-radius:8px;padding:9px 16px;cursor:pointer}
-  .rcard{border:0.5px solid var(--border);border-radius:12px;padding:.85rem 1rem;margin-bottom:10px}
-  .rttl{font-size:14px;font-weight:500;display:flex;align-items:center;gap:8px}
-  .num{background:var(--info-bg);color:var(--info);border-radius:50%;width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;font-size:12px}
-  .rline{font-size:13px;color:var(--muted);margin-top:4px}
-  .note{background:var(--soft);border-radius:8px;padding:10px 12px;font-size:13px;margin-top:6px}
-  .cta{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
-  .cta a{font-size:13px;text-decoration:none;color:var(--text);border:0.5px solid var(--border);border-radius:8px;padding:8px 14px}
-  .cta a.p{background:var(--info-bg);color:var(--info);border-color:var(--info)}
+  button.run{font-size:14px;font-family:inherit;background:var(--info-bg);color:var(--info);border:0.5px solid var(--info);border-radius:8px;padding:10px 18px;cursor:pointer}
+  button.act{font-size:13px;font-family:inherit;background:transparent;color:var(--text);border:0.5px solid var(--border);border-radius:8px;padding:8px 14px;cursor:pointer}
+  /* shareable card (fixed design for clean PNG) */
+  #card{width:100%;background:#ffffff;border:1px solid #e7e5dd;border-radius:16px;overflow:hidden;color:#1c1c1a}
+  #card .band{padding:18px 20px}
+  #card .k{font-size:12px;opacity:.8}
+  #card .name{font-size:26px;font-weight:700;line-height:1.2;margin-top:2px}
+  #card .tag{font-size:14px;font-weight:400}
+  #card .desc{font-size:13px;margin-top:6px;opacity:.92}
+  #card .scorerow{display:flex;align-items:center;gap:10px;margin-top:14px}
+  #card .bar{flex:1;height:9px;background:rgba(0,0,0,0.10);border-radius:99px;overflow:hidden}
+  #card .barfill{height:100%}
+  #card .scoren{font-size:18px;font-weight:700}
+  #card .body{padding:16px 20px;background:#ffffff}
+  #card .body h3{font-size:13px;color:#6b6a64;margin:0 0 8px;font-weight:500}
+  #card .mv{font-size:14px;margin-bottom:6px}
+  #card .mv b{color:#0C447C}
+  #card .foot{display:flex;justify-content:space-between;font-size:11px;color:#9a998f;padding:10px 20px;border-top:1px solid #efede6}
   .credit{text-align:center;font-size:12px;color:var(--muted);margin-top:1.5rem}
   .credit a{color:var(--info);text-decoration:none}
-  i{vertical-align:-2px}
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="lead">
-    <h1>業務AI化マップ（無料診断）</h1>
-    <p>2つ選ぶだけ。あなたが"最初にAIに任せられる業務"と設計メモが出ます。</p>
+    <h1>AI活用タイプ診断</h1>
+    <p>3問でわかる。あなたのタイプ・成熟度スコア・次の一手が、シェアできる1枚で出ます。</p>
   </div>
-  <div class="card">
-    <div class="q">Q1. あなたの事業は？</div>
+  <div class="panel" id="form">
+    <div class="q">Q1. 今のAI活用は？</div>
     <div class="qrow" id="q1">
-      <button class="chip" data-v="個人事業・フリーランス">個人事業・フリーランス</button>
-      <button class="chip" data-v="店舗・サービス業">店舗・サービス業</button>
-      <button class="chip" data-v="建設・現場">建設・現場</button>
-      <button class="chip" data-v="小さなチーム">小さなチーム(〜10名)</button>
+      <button class="chip" data-v="15">これから</button>
+      <button class="chip" data-v="35">たまに使う</button>
+      <button class="chip" data-v="60">業務で使ってる</button>
+      <button class="chip" data-v="80">かなり使いこなす</button>
     </div>
-    <div class="q">Q2. 一番"時間を奪う"業務は？（複数可）</div>
+    <div class="q">Q2. 時間を奪う業務は？（複数可）</div>
     <div class="qrow" id="q2">
       <button class="chip" data-v="invoice">請求書・見積</button>
-      <button class="chip" data-v="mail">問い合わせ・メール対応</button>
+      <button class="chip" data-v="mail">問い合わせ対応</button>
       <button class="chip" data-v="report">日報・報告書</button>
       <button class="chip" data-v="sns">SNS・発信</button>
-      <button class="chip" data-v="sched">予約・スケジュール調整</button>
+      <button class="chip" data-v="sched">予約・調整</button>
       <button class="chip" data-v="data">データ入力・集計</button>
-      <button class="chip" data-v="doc">資料・ドキュメント作成</button>
+      <button class="chip" data-v="doc">資料作成</button>
     </div>
-    <button class="run" id="run"><i class="ti ti-sparkles"></i> 診断する</button>
-    <div id="result" style="margin-top:1.25rem"></div>
+    <div class="q">Q3. AIに任せること、今の気持ちは？</div>
+    <div class="qrow" id="q3">
+      <button class="chip" data-v="-5">まだ不安</button>
+      <button class="chip" data-v="0">興味はある</button>
+      <button class="chip" data-v="8">任せたい</button>
+      <button class="chip" data-v="12">もう任せてる</button>
+    </div>
+    <button class="run" id="run">タイプを診断する</button>
   </div>
+  <div id="result" style="margin-top:1.25rem;"></div>
   <p class="credit">MIWS Company OS — 「AIが会社を運営したらどうなるか」公開実験 ・ <a href="https://x.com/nariken">@nariken</a></p>
 </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
-  const TASKS={
-    invoice:{n:"請求書・見積",ai:"過去データから請求書・見積をドラフト",ok:"金額と送付先を確認",eff:"月末の事務が数十分→数分に"},
-    mail:{n:"問い合わせ・メール対応",ai:"内容を分類し返信文をドラフト",ok:"送信前にひと目チェック",eff:"一次対応が即時化、放置ゼロ"},
-    report:{n:"日報・報告書",ai:"日々の記録から自動生成＋異常も抽出",ok:"内容を承認",eff:"報告書づくりがほぼゼロに"},
-    sns:{n:"SNS・発信",ai:"出来事・実績から投稿をドラフト",ok:"トーンを確認して投稿",eff:"発信の継続が一気に楽に"},
-    sched:{n:"予約・スケジュール調整",ai:"空き枠提案と調整文をドラフト",ok:"確定を承認",eff:"往復のやりとりを大幅削減"},
-    data:{n:"データ入力・集計",ai:"入力・集計・レポート化を自動",ok:"数字を確認",eff:"転記ミスと作業時間を削減"},
-    doc:{n:"資料・ドキュメント作成",ai:"構成と下書きを生成",ok:"仕上げを承認",eff:"ゼロから書く時間を削減"}
-  };
-  let q2=[];
-  document.querySelectorAll('#q1 .chip').forEach(b=>b.onclick=()=>{
-    document.querySelectorAll('#q1 .chip').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');});
-  document.querySelectorAll('#q2 .chip').forEach(b=>b.onclick=()=>{
-    b.classList.toggle('sel');q2=[...document.querySelectorAll('#q2 .chip.sel')].map(x=>x.dataset.v);});
+  const URL_="nariken.github.io/gyomu-ai-map";
+  const TYPES=[
+    {max:35,name:"スターター",tag:"伸びしろMAX",desc:"AIはこれから。最初の1業務を移すだけで、世界が変わります。",bg:"#EAF3DE",fg:"#27500A"},
+    {max:60,name:"ハンター",tag:"点を線に",desc:"ツールを試してる段階。バラけた効率化を繋ぐと、一気に効きます。",bg:"#E6F1FB",fg:"#0C447C"},
+    {max:80,name:"ビルダー",tag:"型ができてる",desc:"仕組み化が進んでる。次は“意思決定の起案”までAIへ。",bg:"#FAEEDA",fg:"#854F0B"},
+    {max:101,name:"オーケストレーター",tag:"承認だけの経営",desc:"AIに会社を運営させる域。あなたの仕事は、承認だけ。",bg:"#EEEDFE",fg:"#3C3489"}
+  ];
+  const TASKS={invoice:"請求書・見積をAIが下書き→承認だけ",mail:"問い合わせをAIが分類して返信ドラフト",report:"日報から報告書を自動生成＋異常も検知",sns:"出来事からSNS投稿をAIがドラフト",sched:"予約・調整の文面をAIがドラフト",data:"入力・集計・レポート化を自動",doc:"資料の構成と下書きをAIが生成"};
+  const GENERIC=["“これは人がやらなくていい”業務を1つ選ぶ","その手順をAIに渡してテンプレ化する","承認だけ自分に残す線引きを決める"];
+  let q1=null,q3=null,q2=[];
+  const pick=(id,set)=>document.querySelectorAll('#'+id+' .chip').forEach(b=>b.onclick=()=>{document.querySelectorAll('#'+id+' .chip').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');set(+b.dataset.v);});
+  pick('q1',v=>q1=v); pick('q3',v=>q3=v);
+  document.querySelectorAll('#q2 .chip').forEach(b=>b.onclick=()=>{b.classList.toggle('sel');q2=[...document.querySelectorAll('#q2 .chip.sel')].map(x=>x.dataset.v);});
   document.getElementById('run').onclick=()=>{
     const r=document.getElementById('result');
-    if(!q2.length){r.innerHTML='<p style="font-size:13px;color:var(--danger)">Q2を1つ以上選んでください。</p>';return;}
-    const pick=q2.slice(0,3);
-    let h='<div style="font-size:13px;color:var(--muted);margin-bottom:8px"><i class="ti ti-checklist"></i> あなたが最初にAIへ任せられる業務 '+pick.length+'件（設計メモ）</div>';
-    pick.forEach((k,i)=>{const t=TASKS[k];h+='<div class="rcard"><div class="rttl"><span class="num">'+(i+1)+'</span>'+t.n+'</div><div class="rline"><i class="ti ti-robot"></i> AIが起案: '+t.ai+'</div><div class="rline"><i class="ti ti-shield-check" style="color:var(--success)"></i> あなたが承認: '+t.ok+'</div><div class="rline"><i class="ti ti-trending-up"></i> 効果: '+t.eff+'</div></div>';});
-    h+='<div class="note"><b style="font-weight:500">AIは"起案"まで・最終承認はあなた</b>。だから安心して任せられます。これがあなたの「最初の設計メモ」です。</div>';
-    h+='<div class="cta"><a class="p" href="https://x.com/nariken">実験をフォローする</a><a href="https://x.com/messages/compose?recipient_id=17831224">この設計を相談する</a></div>';
-    r.innerHTML=h;
+    if(q1===null||q3===null){r.innerHTML='<p style="font-size:13px;color:#A32D2D;">Q1とQ3を選んでください。</p>';return;}
+    const score=Math.max(5,Math.min(99,Math.round(q1+q3+q2.length*2)));
+    const t=TYPES.find(x=>score<x.max);
+    let moves=q2.slice(0,3).map(k=>TASKS[k]); let gi=0; while(moves.length<3){moves.push(GENERIC[gi++]);}
+    let c='<div id="card">';
+    c+='<div class="band" style="background:'+t.bg+';color:'+t.fg+';">';
+    c+='<div class="k">あなたのAI活用タイプ</div>';
+    c+='<div class="name">'+t.name+'</div>';
+    c+='<div class="tag">— '+t.tag+'</div>';
+    c+='<div class="desc">'+t.desc+'</div>';
+    c+='<div class="scorerow"><span style="font-size:12px;">成熟度</span><div class="bar"><div class="barfill" style="width:'+score+'%;background:'+t.fg+';"></div></div><span class="scoren">'+score+'</span></div>';
+    c+='</div>';
+    c+='<div class="body"><h3>あなたの次の一手</h3>';
+    moves.forEach((m,i)=>c+='<div class="mv"><b>'+(i+1)+'.</b> '+m+'</div>');
+    c+='</div>';
+    c+='<div class="foot"><span>AI活用タイプ診断</span><span>'+URL_+' · @nariken</span></div>';
+    c+='</div>';
+    const share='私のAI活用タイプは【'+t.name+'】成熟度'+score+'でした。あなたは？\n→ AI活用タイプ診断 https://'+URL_+'\n#AI会社運営 #PublicBuild';
+    c+='<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">';
+    c+='<button class="act" id="save">画像を保存</button>';
+    c+='<button class="act" onclick="openX(\''+encodeURIComponent(share)+'\')">Xでシェア</button>';
+    c+='<button class="act" onclick="location.href=\'https://x.com/nariken\'">実験をフォロー</button>';
+    c+='</div>';
+    c+='<p style="font-size:12px;color:var(--muted);margin-top:8px;">AIは起案まで・承認はあなた。画像を保存して投稿すると、結果カードがそのまま載ります。</p>';
+    r.innerHTML=c;
+    document.getElementById('save').onclick=()=>{
+      html2canvas(document.getElementById('card'),{scale:2,backgroundColor:'#ffffff'}).then(cv=>{const a=document.createElement('a');a.href=cv.toDataURL('image/png');a.download='ai-type-'+t.name+'.png';a.click();});
+    };
+    r.scrollIntoView({behavior:'smooth',block:'nearest'});
   };
+  function openX(txt){window.open('https://x.com/intent/post?text='+txt,'_blank');}
 </script>
 <script data-goatcounter="https://nariken.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body>
