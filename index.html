@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI活用タイプ診断｜MIWS</title>
-<meta name="description" content="3問でわかる。あなたのAI活用タイプ・成熟度スコア・次の一手3つが、シェアできる1枚で出ます。">
+<title>ChatGPT活用法 診断｜あなたの仕事に効く使い方＋プロンプト</title>
+<meta name="description" content="3問でわかる。あなたの仕事に効くChatGPTの使い方トップ3と、そのままコピペで使えるプロンプトが出ます。">
 <style>
-  :root{ --bg:#f4f3ee; --card:#ffffff; --muted:#6b6a64; --text:#1c1c1a; --border:rgba(0,0,0,0.14); --soft:#f4f3ee; --info-bg:#E6F1FB; --info:#0C447C; }
-  @media (prefers-color-scheme: dark){ :root{ --bg:#1a1a18; --card:#242420; --muted:#a3a29a; --text:#f1efe8; --border:rgba(255,255,255,0.16); --soft:#2c2c28; --info-bg:#0C447C; --info:#B5D4F4; } }
+  :root{ --bg:#f4f3ee; --card:#ffffff; --muted:#6b6a64; --text:#1c1c1a; --border:rgba(0,0,0,0.14); --soft:#f4f3ee; --info-bg:#E6F1FB; --info:#0C447C; --tealbg:#E1F5EE; --teal:#0F6E56; }
+  @media (prefers-color-scheme: dark){ :root{ --bg:#1a1a18; --card:#242420; --muted:#a3a29a; --text:#f1efe8; --border:rgba(255,255,255,0.16); --soft:#2c2c28; --info-bg:#0C447C; --info:#B5D4F4; --tealbg:#085041; --teal:#9FE1CB; } }
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Noto Sans JP","Segoe UI",sans-serif;line-height:1.7;padding:2rem 1rem;-webkit-font-smoothing:antialiased}
   .wrap{max-width:560px;margin:0 auto}
@@ -18,24 +18,20 @@
   .q{font-size:14px;font-weight:500;margin-top:4px}
   .qrow{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 1.2rem}
   .chip{font-size:13px;padding:7px 13px;border-radius:8px;border:0.5px solid var(--border);background:transparent;color:var(--text);cursor:pointer;font-family:inherit}
-  .chip.sel{background:var(--info-bg);color:var(--info);border-color:var(--info)}
-  button.run{font-size:14px;font-family:inherit;background:var(--info-bg);color:var(--info);border:0.5px solid var(--info);border-radius:8px;padding:10px 18px;cursor:pointer}
+  .chip.sel{background:var(--tealbg);color:var(--teal);border-color:var(--teal)}
+  button.run{font-size:14px;font-family:inherit;background:var(--teal);color:#fff;border:none;border-radius:8px;padding:11px 20px;cursor:pointer}
   button.act{font-size:13px;font-family:inherit;background:transparent;color:var(--text);border:0.5px solid var(--border);border-radius:8px;padding:8px 14px;cursor:pointer}
-  /* shareable card (fixed design for clean PNG) */
-  #card{width:100%;background:#ffffff;border:1px solid #e7e5dd;border-radius:16px;overflow:hidden;color:#1c1c1a}
-  #card .band{padding:18px 20px}
-  #card .k{font-size:12px;opacity:.8}
-  #card .name{font-size:26px;font-weight:700;line-height:1.2;margin-top:2px}
-  #card .tag{font-size:14px;font-weight:400}
-  #card .desc{font-size:13px;margin-top:6px;opacity:.92}
-  #card .scorerow{display:flex;align-items:center;gap:10px;margin-top:14px}
-  #card .bar{flex:1;height:9px;background:rgba(0,0,0,0.10);border-radius:99px;overflow:hidden}
-  #card .barfill{height:100%}
-  #card .scoren{font-size:18px;font-weight:700}
-  #card .body{padding:16px 20px;background:#ffffff}
-  #card .body h3{font-size:13px;color:#6b6a64;margin:0 0 8px;font-weight:500}
-  #card .mv{font-size:14px;margin-bottom:6px}
-  #card .mv b{color:#0C447C}
+  .pbox{background:var(--soft);border:0.5px solid var(--border);border-radius:8px;padding:10px 12px;margin-top:6px}
+  .pbox pre{margin:0;font-family:ui-monospace,Menlo,monospace;font-size:12px;white-space:pre-wrap;color:var(--text)}
+  .copy{font-size:12px;font-family:inherit;background:transparent;border:0.5px solid var(--border);border-radius:6px;padding:4px 10px;cursor:pointer;color:var(--text);margin-top:8px}
+  #card{width:100%;background:#fff;border:1px solid #e7e5dd;border-radius:16px;overflow:hidden;color:#1c1c1a}
+  #card .band{background:#E1F5EE;color:#0F6E56;padding:18px 20px}
+  #card .k{font-size:12px;opacity:.85}
+  #card .ttl{font-size:22px;font-weight:700;line-height:1.25;margin-top:2px}
+  #card .lv{font-size:13px;margin-top:4px}
+  #card .body{padding:14px 20px;background:#fff}
+  #card .u{font-size:15px;margin-bottom:7px}
+  #card .u b{color:#0F6E56}
   #card .foot{display:flex;justify-content:space-between;font-size:11px;color:#9a998f;padding:10px 20px;border-top:1px solid #efede6}
   .credit{text-align:center;font-size:12px;color:var(--muted);margin-top:1.5rem}
   .credit a{color:var(--info);text-decoration:none}
@@ -44,93 +40,66 @@
 <body>
 <div class="wrap">
   <div class="lead">
-    <h1>AI活用タイプ診断</h1>
-    <p>3問でわかる。あなたのタイプ・成熟度スコア・次の一手が、シェアできる1枚で出ます。</p>
+    <h1>あなたに効く ChatGPT活用法 診断</h1>
+    <p>3問で、あなたの仕事に効くChatGPTの使い方TOP3と、<b>そのままコピペで使えるプロンプト</b>が出ます。</p>
   </div>
   <div class="panel" id="form">
-    <div class="q">Q1. 今のAI活用は？</div>
+    <div class="q">Q1. ChatGPT、今どれくらい使ってる？</div>
     <div class="qrow" id="q1">
-      <button class="chip" data-v="15">これから</button>
-      <button class="chip" data-v="35">たまに使う</button>
-      <button class="chip" data-v="60">業務で使ってる</button>
-      <button class="chip" data-v="80">かなり使いこなす</button>
+      <button class="chip" data-v="0">使ってない</button>
+      <button class="chip" data-v="1">たまに</button>
+      <button class="chip" data-v="2">よく使う</button>
     </div>
-    <div class="q">Q2. 時間を奪う業務は？（複数可）</div>
+    <div class="q">Q2. 一番めんどうな作業は？（複数可）</div>
     <div class="qrow" id="q2">
-      <button class="chip" data-v="invoice">請求書・見積</button>
-      <button class="chip" data-v="mail">問い合わせ対応</button>
-      <button class="chip" data-v="report">日報・報告書</button>
+      <button class="chip" data-v="mail">メール・問い合わせ返信</button>
+      <button class="chip" data-v="doc">資料・文章作成</button>
+      <button class="chip" data-v="research">情報収集・リサーチ</button>
+      <button class="chip" data-v="data">数字・集計</button>
+      <button class="chip" data-v="idea">アイデア出し</button>
+      <button class="chip" data-v="task">予定・タスク管理</button>
       <button class="chip" data-v="sns">SNS・発信</button>
-      <button class="chip" data-v="sched">予約・調整</button>
-      <button class="chip" data-v="data">データ入力・集計</button>
-      <button class="chip" data-v="doc">資料作成</button>
     </div>
-    <div class="q">Q3. AIに任せること、今の気持ちは？</div>
-    <div class="qrow" id="q3">
-      <button class="chip" data-v="-5">まだ不安</button>
-      <button class="chip" data-v="0">興味はある</button>
-      <button class="chip" data-v="8">任せたい</button>
-      <button class="chip" data-v="12">もう任せてる</button>
-    </div>
-    <button class="run" id="run">タイプを診断する</button>
+    <button class="run" id="run">活用法を診断する</button>
   </div>
   <div id="result" style="margin-top:1.25rem;"></div>
-  <p class="credit">MIWS Company OS — 「AIが会社を運営したらどうなるか」公開実験 ・ <a href="https://x.com/nariken">@nariken</a></p>
+  <p class="credit">MIWS — 「AIが会社を運営したらどうなるか」公開実験 ・ <a href="https://x.com/nariken">@nariken</a></p>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
   const URL_="nariken.github.io/gyomu-ai-map";
-  const TYPES=[
-    {max:35,name:"スターター",tag:"伸びしろMAX",desc:"AIはこれから。最初の1業務を移すだけで、世界が変わります。",bg:"#EAF3DE",fg:"#27500A"},
-    {max:60,name:"ハンター",tag:"点を線に",desc:"ツールを試してる段階。バラけた効率化を繋ぐと、一気に効きます。",bg:"#E6F1FB",fg:"#0C447C"},
-    {max:80,name:"ビルダー",tag:"型ができてる",desc:"仕組み化が進んでる。次は“意思決定の起案”までAIへ。",bg:"#FAEEDA",fg:"#854F0B"},
-    {max:101,name:"オーケストレーター",tag:"承認だけの経営",desc:"AIに会社を運営させる域。あなたの仕事は、承認だけ。",bg:"#EEEDFE",fg:"#3C3489"}
-  ];
-  const TASKS={invoice:"請求書・見積をAIが下書き→承認だけ",mail:"問い合わせをAIが分類して返信ドラフト",report:"日報から報告書を自動生成＋異常も検知",sns:"出来事からSNS投稿をAIがドラフト",sched:"予約・調整の文面をAIがドラフト",data:"入力・集計・レポート化を自動",doc:"資料の構成と下書きをAIが生成"};
-  const GENERIC=["“これは人がやらなくていい”業務を1つ選ぶ","その手順をAIに渡してテンプレ化する","承認だけ自分に残す線引きを決める"];
-  let q1=null,q3=null,q2=[];
-  const pick=(id,set)=>document.querySelectorAll('#'+id+' .chip').forEach(b=>b.onclick=()=>{document.querySelectorAll('#'+id+' .chip').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');set(+b.dataset.v);});
-  pick('q1',v=>q1=v); pick('q3',v=>q3=v);
+  const LV=["これから（初級）","活用中（中級手前）","使い手（中級）"];
+  const T={
+    mail:{t:"メール・問い合わせ返信",use:"返信文を一瞬で作る",p:"以下の問い合わせに、丁寧で簡潔な返信文を作って。\n【相手の文面】（ここに貼る）\n条件：敬語・3〜4行・最後に次の一手を1つ提案"},
+    doc:{t:"資料・文章作成",use:"たたき台を作る",p:"次のテーマで、構成案と本文のたたき台を作って。\n【テーマ】（ここに書く）\n【読み手】（誰向けか）\n【分量】A4・1枚ほど"},
+    research:{t:"情報収集・リサーチ",use:"要点を一瞬で整理",p:"次のテーマを、初心者にもわかるよう5つの要点で整理して。最後に『次に調べるべきこと』を3つ。\n【テーマ】（ここに書く）"},
+    data:{t:"数字・集計",use:"傾向と打ち手を出す",p:"次のデータを見て、傾向・気になる点・打ち手を3つずつ挙げて。\n【データ】（ここに貼る）"},
+    idea:{t:"アイデア出し",use:"壁打ち相手にする",p:"次のテーマでアイデアを10個出して。奇抜→現実的の順に、各1行で。\n【テーマ】（ここに書く）"},
+    task:{t:"予定・タスク管理",use:"優先順位をつける",p:"次のやることリストを、緊急度×重要度で並べ替えて、今日やるべき3つと理由を。\n【リスト】（ここに貼る）"},
+    sns:{t:"SNS・発信",use:"投稿の下書きを作る",p:"次の出来事を、Xの投稿に。共感を呼ぶ問いで終える。140字以内で3案。\n【出来事】（ここに書く）"}
+  };
+  const POP=["mail","doc","research"];
+  let q1=null,q2=[];
+  document.querySelectorAll('#q1 .chip').forEach(b=>b.onclick=()=>{document.querySelectorAll('#q1 .chip').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');q1=+b.dataset.v;});
   document.querySelectorAll('#q2 .chip').forEach(b=>b.onclick=()=>{b.classList.toggle('sel');q2=[...document.querySelectorAll('#q2 .chip.sel')].map(x=>x.dataset.v);});
   document.getElementById('run').onclick=()=>{
     const r=document.getElementById('result');
-    if(q1===null||q3===null){r.innerHTML='<p style="font-size:13px;color:#A32D2D;">Q1とQ3を選んでください。</p>';return;}
-    const score=Math.max(5,Math.min(99,Math.round(q1+q3+q2.length*2)));
-    const t=TYPES.find(x=>score<x.max);
-    let moves=q2.slice(0,3).map(k=>TASKS[k]); let gi=0; while(moves.length<3){moves.push(GENERIC[gi++]);}
-    let c='<div id="card">';
-    c+='<div class="band" style="background:'+t.bg+';color:'+t.fg+';">';
-    c+='<div class="k">あなたのAI活用タイプ</div>';
-    c+='<div class="name">'+t.name+'</div>';
-    c+='<div class="tag">— '+t.tag+'</div>';
-    c+='<div class="desc">'+t.desc+'</div>';
-    c+='<div class="scorerow"><span style="font-size:12px;">成熟度</span><div class="bar"><div class="barfill" style="width:'+score+'%;background:'+t.fg+';"></div></div><span class="scoren">'+score+'</span></div>';
-    c+='</div>';
-    c+='<div class="body"><h3>あなたの次の一手</h3>';
-    moves.forEach((m,i)=>c+='<div class="mv"><b>'+(i+1)+'.</b> '+m+'</div>');
-    c+='</div>';
-    c+='<div class="foot"><span>AI活用タイプ診断</span><span>'+URL_+' · @nariken</span></div>';
-    c+='</div>';
-    const share='私のAI活用タイプは【'+t.name+'】成熟度'+score+'でした。あなたは？\n→ AI活用タイプ診断 https://'+URL_+'\n#AI会社運営 #PublicBuild';
-    c+='<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">';
-    c+='<button class="run" id="share" style="padding:8px 16px;">結果をシェア</button>';
-    c+='<button class="act" id="save">画像を保存</button>';
-    c+='<button class="act" onclick="location.href=\'https://x.com/nariken\'">実験をフォロー</button>';
-    c+='</div>';
-    c+='<p style="font-size:12px;color:var(--muted);margin-top:8px;">スマホは「結果をシェア」で画像つき投稿（共有先にXを選択）。非対応の端末は画像保存＋テキストに自動で切替。</p>';
+    if(q1===null){r.innerHTML='<p style="font-size:13px;color:#A32D2D;">Q1を選んでください。</p>';return;}
+    let keys=q2.slice(0,3); let pi=0; while(keys.length<3){ if(!keys.includes(POP[pi]))keys.push(POP[pi]); pi++; }
+    let c='<div id="card"><div class="band"><div class="k">あなたに効く ChatGPT活用法</div><div class="ttl">'+T[keys[0]].t+' を、AIに任せる</div><div class="lv">あなたのレベル： '+LV[q1]+'</div></div>';
+    c+='<div class="body">';
+    keys.forEach((k,i)=>c+='<div class="u"><b>'+(i+1)+'.</b> '+T[k].t+'：'+T[k].use+'</div>');
+    c+='</div><div class="foot"><span>ChatGPT活用法 診断</span><span>'+URL_+' · @nariken</span></div></div>';
+    c+='<div style="margin-top:1rem;font-size:13px;color:var(--muted);">▼ そのままコピペで使えるプロンプト</div>';
+    keys.forEach((k,i)=>{c+='<div class="pbox"><div style="font-size:13px;font-weight:500;">'+(i+1)+'. '+T[k].use+'</div><pre id="p'+i+'">'+T[k].p.replace(/</g,"&lt;")+'</pre><button class="copy" data-i="'+i+'">コピー</button></div>';});
+    const share='私に効くChatGPT活用法、診断したら『'+T[keys[0]].t+'』だった👇\nコピペで使えるプロンプトまで出た。あなたは？\n→ https://'+URL_+'\n#ChatGPT #AI活用';
+    c+='<div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;"><button class="run" id="share" style="padding:8px 16px;">結果をシェア</button><button class="act" id="save">画像を保存</button><button class="act" onclick="location.href=\'https://x.com/nariken\'">もっと活用法を見る</button></div>';
     r.innerHTML=c;
+    document.querySelectorAll('.copy').forEach(b=>b.onclick=()=>{const tx=document.getElementById('p'+b.dataset.i).innerText;navigator.clipboard.writeText(tx).then(()=>{b.textContent='コピーした！';setTimeout(()=>b.textContent='コピー',1400);});});
     const cardEl=document.getElementById('card');
     const toBlob=()=>html2canvas(cardEl,{scale:2,backgroundColor:'#ffffff'}).then(cv=>new Promise(res=>cv.toBlob(res,'image/png')));
-    document.getElementById('save').onclick=()=>toBlob().then(b=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='ai-type-'+t.name+'.png';a.click();});
-    document.getElementById('share').onclick=async()=>{
-      const blob=await toBlob();
-      const file=new File([blob],'ai-type.png',{type:'image/png'});
-      if(navigator.canShare&&navigator.canShare({files:[file]})){
-        try{await navigator.share({files:[file],text:share});return;}catch(e){if(e&&e.name==='AbortError')return;}
-      }
-      const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='ai-type.png';a.click();
-      window.open('https://x.com/intent/post?text='+encodeURIComponent(share),'_blank');
-    };
+    document.getElementById('save').onclick=()=>toBlob().then(b=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='chatgpt-katsuyo.png';a.click();});
+    document.getElementById('share').onclick=async()=>{const blob=await toBlob();const file=new File([blob],'chatgpt-katsuyo.png',{type:'image/png'});if(navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file],text:share});return;}catch(e){if(e&&e.name==='AbortError')return;}}const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='chatgpt-katsuyo.png';a.click();window.open('https://x.com/intent/post?text='+encodeURIComponent(share),'_blank');};
     r.scrollIntoView({behavior:'smooth',block:'nearest'});
   };
 </script>
